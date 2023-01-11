@@ -34,6 +34,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    needs: Base
     steps:
 
     - name: Checkout
@@ -43,12 +44,11 @@ jobs:
       run: |
         make build
 
-
-
   Jest:
-    name: Build
+    name: Jest
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    needs: Base
     steps:
 
     - name: Checkout
@@ -65,9 +65,10 @@ jobs:
         make codecov CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }}
 
   Snyk:
-    name: Build
+    name: Snyk
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    needs: Base
     steps:
 
     - name: Checkout
