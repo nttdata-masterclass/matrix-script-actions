@@ -16,10 +16,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  Pipeline:
-    name: Build
+
+  Base:
+    name: Base
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 5
     steps:
 
     - name: Checkout
@@ -29,9 +30,29 @@ jobs:
       run: |
         make base
 
+  Build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
     - name: Build
       run: |
         make build
+
+
+
+  Jest:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
 
     - name: Jest
       if: ${{ github.event_name == 'pull_request' }}
@@ -42,6 +63,15 @@ jobs:
       if: ${{ github.event_name == 'pull_request' }}
       run: |
         make codecov CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }}
+
+  Snyk:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
 
     - name: Snyk
       if: ${{ github.event_name == 'pull_request' }}
