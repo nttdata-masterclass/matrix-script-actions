@@ -17,8 +17,8 @@ on:
 
 jobs:
 
-  Base:
-    name: Base
+  Build:
+    name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -44,7 +44,15 @@ jobs:
       run: |
         make codecov CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }}
 
-    - name: Snyk
-      if: ${{ github.event_name == 'pull_request' }}
-      run: |
-        make snyk SNYK_TOKEN=${{ secrets.SNYK_TOKEN }}
+  Snyk:
+    name: Snyk
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: Build
+    steps:
+
+    - uses: actions/checkout@v3
+    - name: Check for vulnerabilities
+      uses: snyk/actions/node@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
