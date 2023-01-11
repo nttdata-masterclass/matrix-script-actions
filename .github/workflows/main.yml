@@ -71,7 +71,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: github.event_name == 'push'
-    needs: [Build, Snyk]
+    needs: Build
     steps:
 
     - name: Checkout
