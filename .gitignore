@@ -1,0 +1,7 @@
+node_modules/
+.npm/
+package-lock.json
+passwd
+.coverage/
+.dccache
+.config/
