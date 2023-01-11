@@ -1,0 +1,49 @@
+name: Pipeline
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+    branches:
+      - develop
+      - main
+  workflow_dispatch:
+
+jobs:
+  Pipeline:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Base
+      run: |
+        make base
+
+    - name: Build
+      run: |
+        make build
+
+    - name: Jest
+      if: ${{ github.event_name == 'pull_request' }}
+      run: |
+        make jest
+
+    - name: Codecov
+      if: ${{ github.event_name == 'pull_request' }}
+      run: |
+        make codecov CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }}
+
+    - name: Snyk
+      if: ${{ github.event_name == 'pull_request' }}
+      run: |
+        make snyk SNYK_TOKEN=${{ secrets.SNYK_TOKEN }}
