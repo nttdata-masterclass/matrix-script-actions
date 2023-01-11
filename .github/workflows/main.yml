@@ -30,29 +30,9 @@ jobs:
       run: |
         make base
 
-  Build:
-    name: Build
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    needs: Base
-    steps:
-
-    - name: Checkout
-      uses: actions/checkout@v3
-
     - name: Build
       run: |
         make build
-
-  Jest:
-    name: Jest
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    needs: Base
-    steps:
-
-    - name: Checkout
-      uses: actions/checkout@v3
 
     - name: Jest
       if: ${{ github.event_name == 'pull_request' }}
@@ -63,16 +43,6 @@ jobs:
       if: ${{ github.event_name == 'pull_request' }}
       run: |
         make codecov CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }}
-
-  Snyk:
-    name: Snyk
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    needs: Base
-    steps:
-
-    - name: Checkout
-      uses: actions/checkout@v3
 
     - name: Snyk
       if: ${{ github.event_name == 'pull_request' }}
