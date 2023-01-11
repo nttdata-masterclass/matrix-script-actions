@@ -44,6 +44,12 @@ jobs:
       run: |
         make codecov CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }}
 
+    - name: Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: artifact
+        path: app/node_modules/
+
   Snyk:
     name: Snyk
     runs-on: ubuntu-latest
@@ -51,7 +57,14 @@ jobs:
     needs: Build
     steps:
 
-    - uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: artifact
+
     - name: Check for vulnerabilities
       uses: snyk/actions/node@master
       env:
