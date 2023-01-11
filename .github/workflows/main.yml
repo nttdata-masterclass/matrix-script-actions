@@ -59,7 +59,7 @@ jobs:
       with:
         node-version: '18.x'
     - run: npm install
-      working-directory: ./app
+      # working-directory: ./app
 
     - name: Check for vulnerabilities
       uses: snyk/actions/node@master
