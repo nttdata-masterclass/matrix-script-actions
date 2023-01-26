@@ -48,5 +48,6 @@ jobs:
         make codecov CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }}
 
     - name: Slack
+      if: ${{ github.event_name == 'push' }}
       run: |
         make slack SLACK_WEBHOOK=${{ secrets.SLACK_WEBHOOK }}
