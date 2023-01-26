@@ -66,9 +66,6 @@ jobs:
       run: |
         make release GIT_TOKEN=${{ secrets.GIT_TOKEN }} -B
 
-
-
-
     - name: Slack
       if: ${{ github.event_name == 'push' }}
       run: |
