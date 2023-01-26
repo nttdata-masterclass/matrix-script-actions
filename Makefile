@@ -7,6 +7,7 @@ DOCKER_UID         = $(shell id -u)
 DOCKER_GID         = $(shell id -g)
 DOCKER_USER        = $(shell whoami)
 AWS_DEFAULT_REGION = us-east-1
+TF_ORGANIZATION    = nttdata-masterclass
 
 base:
 	@docker build -t ${PROJECT}-${ENV}-${SERVICE}:base -f docker/base/Dockerfile .
