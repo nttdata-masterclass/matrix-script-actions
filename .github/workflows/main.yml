@@ -52,6 +52,21 @@ jobs:
       run: |
         make compress -B
 
+    - name: Terraform Base
+      if: ${{ github.event_name == 'push' }}
+      run: |
+        make tf_base -B
+
+    - name: Terraform Init
+      if: ${{ github.event_name == 'push' }}
+      run: |
+        make tf_init -B
+
+    - name: Terraform Apply
+      if: ${{ github.event_name == 'push' }}
+      run: |
+        make tf_apply -B
+
     - name: Slack
       if: ${{ github.event_name == 'push' }}
       run: |

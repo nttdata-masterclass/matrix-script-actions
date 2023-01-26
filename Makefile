@@ -47,11 +47,11 @@ tf_base:
 
 tf_init:
 	@docker run --rm -u ${DOCKER_UID}:${DOCKER_GID} -v ${PWD}/passwd:/etc/passwd:ro -v ${PWD}/backend.hcl:/home/backend.hcl:ro -v ${PWD}/terraformrc:/home/terraformrc:ro -v ${PWD}/terraform:/app \
-	  ${PROJECT}-${ENV}-${SERVICE}:terraform init
+	  ${PROJECT}-${ENV}-${SERVICE}:terraform init -backend-config=/home/backend.hcl
 	@curl -s --header "Authorization: Bearer ${TF_TOKEN}" --header "Content-Type: application/vnd.api+json" --request PATCH --data '{"data":{"type":"workspaces","attributes":{"execution-mode":"local"}}}' "https://app.terraform.io/api/v2/organizations/${TF_ORGANIZATION}/workspaces/${PROJECT}-${ENV}-${SERVICE}"
 
 tf_apply:
-	docker run --rm -u ${DOCKER_UID}:${DOCKER_GID} -v ${PWD}/passwd:/etc/passwd:ro -v ${PWD}/backend.hcl:/home/backend.hcl:ro -v ${PWD}/terraformrc:/home/terraformrc:ro -v ${PWD}/terraform:/app \
+	@docker run --rm -u ${DOCKER_UID}:${DOCKER_GID} -v ${PWD}/passwd:/etc/passwd:ro -v ${PWD}/backend.hcl:/home/backend.hcl:ro -v ${PWD}/terraformrc:/home/terraformrc:ro -v ${PWD}/terraform:/app \
       -e "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" \
       -e "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" \
       -e "AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}" \
@@ -62,4 +62,9 @@ slack:
 	  -d 'payload={"blocks":[{"type":"section","text":{"type":"plain_text","text":"Repositorio desplegado:","emoji":true}},{"type":"section","fields":[{"type":"plain_text","text":"Name:","emoji":true},{"type":"plain_text","text":"${GITHUB_REPOSITORY}","emoji":true},{"type":"plain_text","text":"Env:","emoji":true},{"type":"plain_text","text":"${ENV}","emoji":true}]},{"type":"section","text":{"type":"mrkdwn","text":"Para acceder al despliegue:"},"accessory":{"type":"button","text":{"type":"plain_text","text":"GitHub","emoji":true},"value":"click_me_123","url":"https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/","action_id":"button-action"}}]}' \
 	"${SLACK_WEBHOOK}"
 
-
+tf_destroy:
+	@docker run --rm -u ${DOCKER_UID}:${DOCKER_GID} -v ${PWD}/passwd:/etc/passwd:ro -v ${PWD}/backend.hcl:/home/backend.hcl:ro -v ${PWD}/terraformrc:/home/terraformrc:ro -v ${PWD}/terraform:/app \
+      -e "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" \
+      -e "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" \
+      -e "AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}" \
+    ${PROJECT}-${ENV}-${SERVICE}:terraform destroy -var="name=${PROJECT}-${ENV}-${SERVICE}" -auto-approve
