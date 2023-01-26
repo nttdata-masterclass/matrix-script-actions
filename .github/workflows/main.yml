@@ -47,6 +47,11 @@ jobs:
       run: |
         make codecov CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }} -B
 
+    - name: Compress
+      if: ${{ github.event_name == 'push' }}
+      run: |
+        make compress -B
+
     - name: Slack
       if: ${{ github.event_name == 'push' }}
       run: |

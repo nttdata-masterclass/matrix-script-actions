@@ -1,7 +1,10 @@
 resource "aws_iam_role" "main" {
   name = var.name
   path = "/"
-  tags = var.tags
+
+  tags = {
+    Name = var.name
+  }
 
   assume_role_policy = <<EOF
 {
@@ -47,19 +50,24 @@ EOF
 
 resource "aws_cloudwatch_log_group" "main" {
   name              = "/aws/lambda/${var.name}"
-  retention_in_days = var.retention_in_days
-  tags              = var.tags
+  retention_in_days = 7
+
+  tags = {
+    Name = var.name
+  }
 }
 
 resource "aws_lambda_function" "main" {
   function_name    = var.name
-  description      = var.description
-  filename         = var.filename
-  handler          = var.handler
-  runtime          = var.runtime
-  memory_size      = var.memory_size
-  timeout          = var.timeout
-  tags             = var.tags
-  source_code_hash = var.source_code_hash
+  filename         = "app.zip"
+  source_code_hash = filebase64sha256("app.zip")
+  handler          = "app.handler"
+  runtime          = "nodejs18.x"
+  memory_size      = 128
+  timeout          = 5
   role             = aws_iam_role.main.arn
+
+  tags = {
+    Name = var.name
+  }
 }

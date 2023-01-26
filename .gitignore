@@ -12,3 +12,5 @@ backend.hcl
 .terraform/
 .terraform.d/
 .terraform.lock.hcl
+app.zip
+errored.tfstate
