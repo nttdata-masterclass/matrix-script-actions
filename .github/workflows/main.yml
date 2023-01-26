@@ -26,28 +26,48 @@ jobs:
 
     - name: Base
       run: |
-        make base
+        make base -B
 
     - name: Build
       run: |
-        make build
+        make build -B
 
     - name: Snyk
       if: ${{ github.event_name == 'pull_request' }}
       run: |
-        make snyk SNYK_TOKEN=${{ secrets.SNYK_TOKEN }}
+        make snyk SNYK_TOKEN=${{ secrets.SNYK_TOKEN }} -B
 
     - name: Jest
       if: ${{ github.event_name == 'pull_request' }}
       run: |
-        make jest
+        make jest -B
 
     - name: Codecov
       if: ${{ github.event_name == 'pull_request' }}
       run: |
-        make codecov CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }}
+        make codecov CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }} -B
+
+    - name: Compress
+      if: ${{ github.event_name == 'push' }}
+      run: |
+        make compress -B
+
+    - name: Terraform Base
+      if: ${{ github.event_name == 'push' }}
+      run: |
+        make tf_base -B
+
+    - name: Terraform Init
+      if: ${{ github.event_name == 'push' }}
+      run: |
+        make tf_init -B
+
+    - name: Terraform Apply
+      if: ${{ github.event_name == 'push' }}
+      run: |
+        make tf_apply -B
 
     - name: Slack
       if: ${{ github.event_name == 'push' }}
       run: |
-        make slack SLACK_WEBHOOK=${{ secrets.SLACK_WEBHOOK }}
+        make slack SLACK_WEBHOOK=${{ secrets.SLACK_WEBHOOK }} -B
