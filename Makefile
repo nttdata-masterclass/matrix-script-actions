@@ -46,7 +46,7 @@ tf_base:
 	@sed -i "s|{{TF_ORGANIZATION}}|${TF_ORGANIZATION}|g" backend.hcl
 	@echo '${DOCKER_USER}:x:${DOCKER_UID}:${DOCKER_GID}::/app:/sbin/nologin' > passwd
 
-tf_init:
+tf_init: tf_base
 	@docker run --rm -u ${DOCKER_UID}:${DOCKER_GID} -v ${PWD}/passwd:/etc/passwd:ro -v ${PWD}/backend.hcl:/home/backend.hcl:ro -v ${PWD}/terraformrc:/home/terraformrc:ro -v ${PWD}/terraform:/app \
 	  ${PROJECT}-${ENV}-${SERVICE}:terraform init -backend-config=/home/backend.hcl
 	@curl -s --header "Authorization: Bearer ${TF_TOKEN}" --header "Content-Type: application/vnd.api+json" --request PATCH --data '{"data":{"type":"workspaces","attributes":{"execution-mode":"local"}}}' "https://app.terraform.io/api/v2/organizations/${TF_ORGANIZATION}/workspaces/${PROJECT}-${ENV}-${SERVICE}"

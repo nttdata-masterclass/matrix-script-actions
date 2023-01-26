@@ -51,11 +51,6 @@ jobs:
       run: |
         make compress -B
 
-    - name: Terraform Base
-      if: ${{ github.event_name == 'push' }}
-      run: |
-        make tf_base TF_TOKEN=${{ secrets.TF_TOKEN }} -B
-
     - name: Terraform Init
       if: ${{ github.event_name == 'push' }}
       run: |
