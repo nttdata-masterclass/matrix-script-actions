@@ -28,10 +28,23 @@ snyk:
 	@docker run --rm -u ${DOCKER_UID}:${DOCKER_GID} -v ${PWD}/passwd:/etc/passwd:ro -v ${PWD}/app:/app ${PROJECT}-${ENV}-${SERVICE}:snyk auth ${SNYK_TOKEN}
 	@docker run --rm -u ${DOCKER_UID}:${DOCKER_GID} -v ${PWD}/passwd:/etc/passwd:ro -v ${PWD}/app:/app ${PROJECT}-${ENV}-${SERVICE}:snyk code test
 
-terraform:
+tf_base:
 	@docker build -t ${PROJECT}-${ENV}-${SERVICE}:terraform --build-arg IMAGE=${PROJECT}-${ENV}-${SERVICE}:base -f docker/terraform/Dockerfile .
+	@rm -rf terraformrc
+	@rm -rf backend.hcl
+	@cp configs/terraformrc terraformrc
+	@cp configs/backend.hcl backend.hcl
+	@sed -i "s|{{TF_TOKEN}}|${TF_TOKEN}|g" terraformrc
+	@sed -i "s|{{WORKSPACES}}|${PROJECT}-${ENV}-${SERVICE}|g" backend.hcl
+	@sed -i "s|{{TF_ORGANIZATION}}|${TF_ORGANIZATION}|g" backend.hcl
+	@echo '${DOCKER_USER}:x:${DOCKER_UID}:${DOCKER_GID}::/app:/sbin/nologin' > passwd
+
+tf_init:
+	docker run --rm -u ${DOCKER_UID}:${DOCKER_GID} -v ${PWD}/passwd:/etc/passwd:ro -v ${PWD}/backend.hcl:/home/backend.hcl:ro -v ${PWD}/terraformrc:/home/terraformrc:ro -v ${PWD}/terraform:/app ${PROJECT}-${ENV}-${SERVICE}:terraform init -backend-config=/home/backend.hcl
 
 slack:
 	curl -X POST \
 	  -d 'payload={"blocks":[{"type":"section","text":{"type":"plain_text","text":"Repositorio desplegado:","emoji":true}},{"type":"section","fields":[{"type":"plain_text","text":"Name:","emoji":true},{"type":"plain_text","text":"${GITHUB_REPOSITORY}","emoji":true},{"type":"plain_text","text":"Env:","emoji":true},{"type":"plain_text","text":"${ENV}","emoji":true}]},{"type":"section","text":{"type":"mrkdwn","text":"Para acceder al despliegue:"},"accessory":{"type":"button","text":{"type":"plain_text","text":"GitHub","emoji":true},"value":"click_me_123","url":"https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/","action_id":"button-action"}}]}' \
 	"${SLACK_WEBHOOK}"
+
+

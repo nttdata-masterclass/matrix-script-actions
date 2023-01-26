@@ -5,3 +5,10 @@ passwd
 .coverage/
 .dccache
 .config/
+terraformrc
+backend.hcl
+!configs/backend.hcl
+!configs/terraformrc
+.terraform/
+.terraform.d/
+.terraform.lock.hcl

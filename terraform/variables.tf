@@ -3,7 +3,7 @@ variable "name" {
 }
 
 variable "source_code_hash" {
-  default = filebase64sha256("app.zip")
+  type = string
 }
 
 variable "filename" {
