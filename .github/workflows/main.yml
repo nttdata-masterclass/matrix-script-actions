@@ -3,7 +3,6 @@ name: Pipeline
 on:
   push:
     branches:
-      - develop
       - main
   pull_request:
     types:
@@ -11,7 +10,6 @@ on:
       - synchronize
       - reopened
     branches:
-      - develop
       - main
   workflow_dispatch:
 
@@ -20,7 +18,7 @@ jobs:
   Build:
     name: Build
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
 
     - name: Checkout
@@ -34,6 +32,11 @@ jobs:
       run: |
         make build
 
+    - name: snyk
+      if: ${{ github.event_name == 'pull_request' }}
+      run: |
+        make snyk SNYK_TOKEN=${{ secrets.SNYK_TOKEN }}
+
     - name: Jest
       if: ${{ github.event_name == 'pull_request' }}
       run: |
@@ -44,39 +47,7 @@ jobs:
       run: |
         make codecov CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }}
 
-  Snyk:
-    name: Snyk
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    if: ${{ github.event_name == 'pull_request' }}
-    steps:
-
-    - name: Checkout
-      uses: actions/checkout@v3
-
-    - name: Use Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18.x'
-    - run: npm install
-
-    - name: Check for vulnerabilities
-      uses: snyk/actions/node@master
-      env:
-        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-
-
-  Deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    if: github.event_name == 'push'
-    needs: Build
-    steps:
-
-    - name: Checkout
-      uses: actions/checkout@v3
-
-    - name: Release
+    - name: Slack
+      if: ${{ github.event_name == 'push' }}
       run: |
-        echo "Release"
+        make slack SLACK_WEBHOOK=${{ secrets.SLACK_WEBHOOK }}
