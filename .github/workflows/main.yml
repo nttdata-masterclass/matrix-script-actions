@@ -55,7 +55,7 @@ jobs:
     - name: Terraform Base
       if: ${{ github.event_name == 'push' }}
       run: |
-        make tf_base -B
+        make tf_base TF_TOKEN=${{ secrets.TF_TOKEN }} -B
 
     - name: Terraform Init
       if: ${{ github.event_name == 'push' }}
